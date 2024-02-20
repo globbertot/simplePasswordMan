@@ -21,6 +21,10 @@
 #include <QClipboard>
 #include <QMouseEvent>
 #include <QPoint>
+#include <QDesktopServices>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -38,6 +42,9 @@ public:
 
     // Core variables
     bool showPasswords = false;
+    bool alwaysGeneratePass = true;
+    const std::string updatesURL = "https://github.com/globbertot/simplePasswordMan/releases/latest";
+    const std::string VERSION = "V0.2";
 
     // core logic
     void create();
@@ -65,5 +72,8 @@ private:
 
     bool isMousePressed;
     QPoint dragStart;
+
+    QNetworkAccessManager* netManager;
+    QNetworkRequest req;
 };
 #endif // WINDOW_H
