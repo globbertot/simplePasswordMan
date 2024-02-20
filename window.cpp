@@ -7,8 +7,30 @@ window::window(QWidget *parent)
 {
     ui->setupUi(this);
     db = new dbManager();
+    netManager = new QNetworkAccessManager;
+    QObject::connect(netManager, &QNetworkAccessManager::finished, this, [this](QNetworkReply* reply) {
+        if (reply->error()) {
+            qDebug() << reply->errorString();return;
+        }
+
+        int versionTag = reply->url().toString().lastIndexOf('/');
+        if (versionTag != -1) {
+            std::string foundVersion = reply->url().toString().mid(versionTag + 1).toStdString();
+            if (foundVersion != VERSION) { // or in other words, if theres an update
+                QMessageBox::StandardButton rep;
+                rep = QMessageBox::question(this, "Update found!", "Hey! turns out theres a new update, we suggest installing it\nThe application will close automaticly if you choose to install it\nFurther instructions on installation are on the README file", QMessageBox::Ok | QMessageBox::No);
+                if (rep == QMessageBox::Ok) {
+                    QDesktopServices::openUrl(QString::fromStdString(updatesURL));
+                    exit(0);
+                }
+            }
+        }
+    });
+    req.setUrl(QString::fromStdString(updatesURL));
+    netManager->get(req);
 
     showPasswords = setts.value("showPasswords", false).toBool();
+    alwaysGeneratePass = setts.value("alwaysGeneratePasswords", true).toBool();
 
     // Connect each command to its proper function
     connect(ui->createBtn, &QPushButton::clicked, this, [this]() { window::create(); });
@@ -146,21 +168,50 @@ void window::create() {
     password->setPlaceholderText("Enter the actual password");
     password->setObjectName("passwordLine");
 
+    // Password create automatically checkbox
+    QCheckBox* autoPassGen = new QCheckBox();
+    autoPassGen->setObjectName("passAutoGen");
+    autoPassGen->setText("Create a password for me");
+    autoPassGen->setChecked(alwaysGeneratePass);
+
     // Create button
     QPushButton* createBtn = new QPushButton();
     createBtn->setObjectName("createBtn");
     createBtn->setText("Create!");
 
-    createBtn->connect(createBtn, &QPushButton::clicked, this, [this, service, password]() {
-        if (!service->text().isEmpty() && !password->text().isEmpty()) {
-            db->create(service->text().toStdString(), password->text().toStdString());
+    // Return button
+    QPushButton* goBack = new QPushButton();
+    goBack->setObjectName("go back");
+    goBack->setText("Nevermind, go back");
+
+    service->connect(service, &QLineEdit::returnPressed, this, [this, password]() {password->setFocus();});
+    password->connect(password, &QLineEdit::returnPressed, this, [this, createBtn]() {createBtn->click();});
+
+    createBtn->connect(createBtn, &QPushButton::clicked, this, [this, service, password, autoPassGen]() {
+        if (autoPassGen->isChecked()) {
+            std::string pass = db->generatePass();
+            if (!service->text().isEmpty()) {
+                db->create(service->text().toStdString(), pass);
+            }
         }
+        else {
+            if (!service->text().isEmpty() && !password->text().isEmpty()) {
+                db->create(service->text().toStdString(), password->text().toStdString());
+            }
+        }
+    });
+
+    goBack->connect(goBack, &QPushButton::clicked, this, [this]() {
+        clearScreen();
+        enableDisableCommands(1);
     });
 
     // Add them to the ui
     ui->Managment->addWidget(service);
     ui->Managment->addWidget(password);
+    ui->Managment->addWidget(autoPassGen);
     ui->Managment->addWidget(createBtn);
+    ui->Managment->addWidget(goBack);
 }
 
 void window::_delete() {
@@ -176,6 +227,18 @@ void window::_delete() {
     deleteBtn->setObjectName("deleteBtn");
     deleteBtn->setText("Delete");
 
+    // Return button
+    QPushButton* goBack = new QPushButton();
+    goBack->setObjectName("go back");
+    goBack->setText("Nevermind, go back");
+
+    goBack->connect(goBack, &QPushButton::clicked, this, [this]() {
+        clearScreen();
+        enableDisableCommands(1);
+    });
+
+    service->connect(service, &QLineEdit::returnPressed, this, [this, deleteBtn]() {deleteBtn->click();});
+
     deleteBtn->connect(deleteBtn, &QPushButton::clicked, this, [this, service]() {
         if (!service->text().isEmpty()) {
             db->_delete(service->text().toStdString());
@@ -184,6 +247,7 @@ void window::_delete() {
 
     ui->Managment->addWidget(service);
     ui->Managment->addWidget(deleteBtn);
+    ui->Managment->addWidget(goBack);
 }
 
 void window::search() {
@@ -199,6 +263,18 @@ void window::search() {
     searchBtn->setObjectName("searchBtn");
     searchBtn->setText("Read");
 
+    // Return button
+    QPushButton* goBack = new QPushButton();
+    goBack->setObjectName("go back");
+    goBack->setText("Nevermind, go back");
+
+    goBack->connect(goBack, &QPushButton::clicked, this, [this]() {
+        clearScreen();
+        enableDisableCommands(1);
+    });
+
+    service->connect(service, &QLineEdit::returnPressed, this, [searchBtn]() {searchBtn->click();});
+
     searchBtn->connect(searchBtn, &QPushButton::clicked, this, [this, service](){
         if (!service->text().isEmpty()) {
             db->search(service->text().toStdString());
@@ -207,6 +283,7 @@ void window::search() {
 
     ui->Managment->addWidget(service);
     ui->Managment->addWidget(searchBtn);
+    ui->Managment->addWidget(goBack);
 }
 
 void window::updatePass() {
@@ -224,15 +301,44 @@ void window::updatePass() {
     updateBtn->setText("Update");
     updateBtn->setObjectName("updateBtn");
 
-    updateBtn->connect(updateBtn, &QPushButton::clicked, this, [this, service, pass](){
-        if (!service->text().isEmpty() && !pass->text().isEmpty()) {
-            db->updatePassword(service->text().toStdString(), pass->text().toStdString());
+    // Password create automatically checkbox
+    QCheckBox* autoPassGen = new QCheckBox();
+    autoPassGen->setObjectName("passAutoGen");
+    autoPassGen->setText("Create a password for me");
+    autoPassGen->setChecked(alwaysGeneratePass);
+
+    // Return button
+    QPushButton* goBack = new QPushButton();
+    goBack->setObjectName("go back");
+    goBack->setText("Nevermind, go back");
+
+    goBack->connect(goBack, &QPushButton::clicked, this, [this]() {
+        clearScreen();
+        enableDisableCommands(1);
+    });
+
+    service->connect(service, &QLineEdit::returnPressed, this, [this, pass]() {pass->setFocus();});
+    pass->connect(pass, &QLineEdit::returnPressed, this, [this, updateBtn]() {updateBtn->click();});
+
+    updateBtn->connect(updateBtn, &QPushButton::clicked, this, [this, service, pass, autoPassGen]() {
+        if (autoPassGen->isChecked()) {
+            std::string pass = db->generatePass();
+            if (!service->text().isEmpty()) {
+                db->updatePassword(service->text().toStdString(), pass);
+            }
+        }
+        else {
+            if (!service->text().isEmpty() && !pass->text().isEmpty()) {
+                db->updatePassword(service->text().toStdString(), pass->text().toStdString());
+            }
         }
     });
 
     ui->Managment->addWidget(service);
     ui->Managment->addWidget(pass);
     ui->Managment->addWidget(updateBtn);
+    ui->Managment->addWidget(autoPassGen);
+    ui->Managment->addWidget(goBack);
 }
 
 void window::showPassPolicy() {
@@ -320,6 +426,11 @@ void window::settings() {
     hidePasswordsBtn->setText("Show passwords");
     hidePasswordsBtn->setChecked(showPasswords);
 
+    QCheckBox* alwaysGenPasswordsBtn = new QCheckBox();
+    alwaysGenPasswordsBtn->setObjectName("alwaysGenpasswords");
+    alwaysGenPasswordsBtn->setText("Always generate passwords automatically");
+    alwaysGenPasswordsBtn->setChecked(alwaysGeneratePass);
+
     QPushButton* goBack = new QPushButton();
     goBack->setObjectName("goBACK");
     goBack->setText("Nevermind, go back");
@@ -332,6 +443,8 @@ void window::settings() {
             // Procceed deletion
             db->resetSettings();
             setts.setValue("showPasswords", false);
+            setts.setValue("alwaysGeneratePasswords", true);
+
             QSqlDatabase::database("main").close();
             QFile dbToDelete("simplePassMan.db");
             if (!dbToDelete.remove()) {
@@ -347,10 +460,17 @@ void window::settings() {
         setts.setValue("showPasswords", showPasswords);
     } );
 
+    alwaysGenPasswordsBtn->connect(alwaysGenPasswordsBtn, &QCheckBox::clicked, this, [this, alwaysGenPasswordsBtn]() {
+        alwaysGeneratePass = !alwaysGeneratePass;
+        alwaysGenPasswordsBtn->setChecked(alwaysGeneratePass);
+        setts.setValue("alwaysGeneratePasswords", alwaysGeneratePass);
+    });
+
     goBack->connect(goBack, &QPushButton::clicked, this, [this]() { clearScreen();enableDisableCommands(1); });
 
     ui->Managment->addWidget(passPolicyEditBtn);
     ui->Managment->addWidget(clearDataBtn);
     ui->Managment->addWidget(hidePasswordsBtn);
+    ui->Managment->addWidget(alwaysGenPasswordsBtn);
     ui->Managment->addWidget(goBack);
 }
