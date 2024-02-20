@@ -17,8 +17,7 @@ This is a simple password manager written in C++ with the use of the Qt framewor
 - Improving the source code
 
 ## Known Issues
-- database file not deleted when uninstalling the program (FIX IN PROGRESS)
-- database file not found when launching the program (FIX FOUND: RUN AS ADMIN, WILL FIX NEXT UPDATE)
+None atm.
 
 ## Download Instructions
 ### Windows
