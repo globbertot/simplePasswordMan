@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QList>
 #include <QLabel>
+#include <random>
 
 class dbManager : public QObject
 {
@@ -21,12 +22,12 @@ public:
 
     // Main variables will be customizable in the future
     std::map<std::string, int> passPolicy = {
-        {"maxPassLength", 18},
-        {"minPassLength", 8},
-        {"minLetters", 1},
-        {"minNumbers", 1},
-        {"minSymbols", 1},
-        {"maxSymbolsRepeat", 3},
+        {"maxPassLength", 28},
+        {"minPassLength", 16},
+        {"minLetters", 2},
+        {"minNumbers", 2},
+        {"minSymbols", 2},
+        {"maxSymbolsRepeat", 6},
     };
     QSettings passPolicySets;
 
@@ -41,6 +42,7 @@ public:
     // Helper functions
     bool exists(const std::string& table, const std::string& item, const std::string& columnToFind);
     bool checkPassword(std::string pass);
+    std::string generatePass();
     void resetSettings();
 signals:
     void databaseActionCompleted(bool success, std::string action, std::string errMsg = "", QList<std::string> results = {});
