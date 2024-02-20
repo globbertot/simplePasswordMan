@@ -20,12 +20,12 @@ dbManager::dbManager(QObject *parent) : QObject(parent), passPolicySets("globber
 dbManager::~dbManager() { db.close(); }
 
 void dbManager::resetSettings() {
-    passPolicy["maxPassLength"] = passPolicySets.value("maxPassLength", 18).toInt();passPolicySets.setValue("maxPassLength", 18);
-    passPolicy["minPassLength"] = passPolicySets.value("minPassLength", 8).toInt();passPolicySets.setValue("minPassLength", 8);
-    passPolicy["minLetters"] = passPolicySets.value("minLetters", 1).toInt();passPolicySets.setValue("minLetters", 1);
-    passPolicy["minNumbers"] = passPolicySets.value("minNumbers", 1).toInt();passPolicySets.setValue("minNumbers", 1);
-    passPolicy["minSymbols"] = passPolicySets.value("minSymbols", 1).toInt();passPolicySets.setValue("minSymbols", 1);
-    passPolicy["maxSymbolsRepeat"] = passPolicySets.value("maxSymbolsRepeat", 3).toInt();passPolicySets.setValue("maxSymbolsRepeat", 3);
+    passPolicy["maxPassLength"] = passPolicySets.value("maxPassLength", 28).toInt();passPolicySets.setValue("maxPassLength", 28);
+    passPolicy["minPassLength"] = passPolicySets.value("minPassLength", 16).toInt();passPolicySets.setValue("minPassLength", 16);
+    passPolicy["minLetters"] = passPolicySets.value("minLetters", 2).toInt();passPolicySets.setValue("minLetters", 2);
+    passPolicy["minNumbers"] = passPolicySets.value("minNumbers", 2).toInt();passPolicySets.setValue("minNumbers", 2);
+    passPolicy["minSymbols"] = passPolicySets.value("minSymbols", 2).toInt();passPolicySets.setValue("minSymbols", 2);
+    passPolicy["maxSymbolsRepeat"] = passPolicySets.value("maxSymbolsRepeat", 6).toInt();passPolicySets.setValue("maxSymbolsRepeat", 6);
 }
 
 bool dbManager::exists(const std::string& table, const std::string& item, const std::string& columnToFind) {
@@ -61,6 +61,56 @@ bool dbManager::checkPassword(std::string pass) {
     if (passPolicy["minSymbols"] != -1 && symbols.size() < passPolicy["minSymbols"]) { emit databaseActionCompleted(false, "CHECKPASS", "Password must contain more than "+std::to_string(passPolicy["minSymbols"])+" symbols");return false; }
 
     return true;
+}
+
+std::string dbManager::generatePass() {
+    std::random_device rd;std::mt19937 gen(rd());
+    std::string pass = "";
+    int lettersC = 0;int numsC = 0;int symbolsC = 0;
+    std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
+    std::string numbers = "0123456789";
+    std::string symbols = "!@#$%&*";
+
+    int length = std::uniform_int_distribution<int>(passPolicy["minPassLength"], passPolicy["maxPassLength"])(gen);
+
+    for (int i=0;i<length;++i) {
+        int category = gen() % 3; // 0 for letter || 1 for number || 2 for symbol
+
+        if (category == 0) {
+            // Add a letter
+            pass += (gen() % 2 == 0) ? std::tolower((alphabet[gen() % alphabet.size()])) : std::toupper((alphabet[gen() % alphabet.size()]));
+            lettersC++;
+        } else if (category == 1) {
+            // Add a number
+            pass += numbers[gen() % numbers.size()];
+            numsC++;
+        } else {
+            // Add a symbol
+            if (symbolsC >= passPolicy["maxSymbolsRepeat"]) { continue; }
+            pass += symbols[gen() % symbols.size()];
+            symbolsC++;
+        }
+    }
+
+    if (lettersC < passPolicy["minLetters"]) {
+        for (int i=lettersC;i<passPolicy["minLetters"];++i) {
+            pass += (gen() % 2 == 0) ? std::tolower((alphabet[gen() % alphabet.size()])) : std::toupper((alphabet[gen() % alphabet.size()]));
+        }
+    }
+
+    if (numsC < passPolicy["minNumbers"]) {
+        for (int i=numsC;i<passPolicy["minNumbers"];++i) {
+            pass += numbers[gen() % numbers.size()];
+        }
+    }
+
+    if (symbolsC < passPolicy["minSymbols"]) {
+        for (int i=symbolsC;i<passPolicy["minSymbols"];++i) {
+            pass += symbols[gen() % symbols.size()];
+        }
+    }
+
+    return pass;
 }
 
 void dbManager::create(std::string service, std::string password) {
