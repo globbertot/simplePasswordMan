@@ -17,7 +17,7 @@ This is a simple password manager written in C++ with the use of the Qt framewor
 - Improving the source code
 
 ## Known Issues
-None atm.
+Deleting everything not working will be fixed soon
 
 ## Download Instructions
 ### Windows
