@@ -25,8 +25,8 @@ None atm.
 Installing on Windows is straightforward. Follow these steps:
 
 1. Go to the [releases page](https://github.com/globbertot/simplePasswordMan/releases).
-2. Download the latest version for your windows machine.
-3. Run the installer, choose the desired installation path, and complete the installation.
+2. Download the latest version for your windows machine. (note that if a pop-up shows up saying this file is not commonly downloaded/is mallicous, try either right clicking and pressing keep or look up a tutorial on how to keep the file)
+3. Run the installer, and go through the process (once again, if smartscreen pops up, clicking More Info and run anyway should fix the problem)
 4. Run the shortcut on your desktop (as admin), and you're ready to use the password manager.
 
 ### Linux
