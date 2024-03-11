@@ -6,31 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1032</width>
-    <height>606</height>
+    <width>1228</width>
+    <height>834</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">background-color: rgb(33, 33, 33);
-color: rgb(255, 255, 255);
-
-
-border-top-color: rgb(34, 34, 34);
-border-right-color: rgb(34, 34, 34);
-border-left-color: rgb(34, 34, 34);
-border-bottom-color: rgb(34, 34, 34);
-</string>
-  </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="app">
    <widget class="QWidget" name="formLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>110</y>
-      <width>741</width>
+      <x>120</x>
+      <y>90</y>
+      <width>1031</width>
       <height>111</height>
      </rect>
     </property>
@@ -115,10 +104,10 @@ border-bottom-color: rgb(34, 34, 34);
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>230</y>
-      <width>311</width>
-      <height>341</height>
+      <x>10</x>
+      <y>200</y>
+      <width>551</width>
+      <height>631</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="Managment"/>
@@ -126,20 +115,20 @@ border-bottom-color: rgb(34, 34, 34);
    <widget class="QWidget" name="verticalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>580</x>
       <y>230</y>
-      <width>551</width>
-      <height>331</height>
+      <width>641</width>
+      <height>531</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="Results"/>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>0</y>
-      <width>1021</width>
+      <width>1211</width>
       <height>81</height>
      </rect>
     </property>
@@ -158,8 +147,7 @@ border-bottom-color: rgb(34, 34, 34);
         </font>
        </property>
        <property name="text">
-        <string>SIMPLE PASSWORD MAN - ALPHA RELEASE V0.1
-Please report any bugs to help.simplepassman@gmail.com</string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -185,7 +173,6 @@ Please report any bugs to help.simplepassman@gmail.com</string>
     </layout>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>
