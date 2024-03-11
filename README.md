@@ -17,8 +17,7 @@ This is a simple password manager written in C++ with the use of the Qt framewor
 - Improving the source code
 
 ## Known Issues
-Title not maching current version (FIX NEXT UPDATE)
-(NOTE THAT V0.2 CAUSED SOME ISSUES ON WINDOWS, SO IF YOU UPDATED EARLY, PLEASE REINSTALL)
+**SOMETIMES**, when updating from V0.2 to V0.3, your old theme was still a thing and is found on the theme picker (FIX: delete that theme and select any other theme and this is fixed)
 
 ## Download Instructions
 ### Windows
@@ -35,3 +34,4 @@ Installing on linux is also easy, Follow these steps:
 1. Go to the [releases page](https://github.com/globbertot/simplePasswordMan/releases).
 2. Download the latest version for your linux machine instead.
 3. Run the application and you are ready to use the password manager
+4. If you happen to have an error message when starting up saying going something like "SSL handshake failed: the issuer certificate of a locally looked up certificate could not be found", you should run this command: `sudo apt-get update && sudo apt-get install --reinstall ca-certificates`
