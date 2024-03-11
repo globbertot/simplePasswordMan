@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    window w;
+    window w(nullptr);
     w.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     w.show();
 
