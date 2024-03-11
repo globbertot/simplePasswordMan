@@ -2,11 +2,10 @@
 
 dbManager::dbManager(QObject *parent) : QObject(parent), passPolicySets("globbertot", "simplePassMan") {
     db = QSqlDatabase::addDatabase("QSQLITE", "main");
-    db.setDatabaseName("simplePassMan.db");
-    if (!db.open()) {
-        qDebug() << "UNABLE TO START DATABASE - " << db.lastError().text();
-        return;
-    }
+    QDir().mkpath(dbPath);
+    db.setDatabaseName(dbPath+"/simplePassMan.db");
+    db.open();
+
     resetSettings();
 
     QSqlQuery createDatabase(db);
