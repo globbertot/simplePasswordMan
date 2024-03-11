@@ -8,9 +8,11 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 #include <QSettings>
+#include <QDir>
 #include <QDebug>
 #include <QList>
 #include <QLabel>
+#include <QStandardPaths>
 #include <random>
 
 class dbManager : public QObject
@@ -30,6 +32,7 @@ public:
         {"maxSymbolsRepeat", 6},
     };
     QSettings passPolicySets;
+    const QString dbPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
     // Core logic
     void create(std::string service, std::string password);
@@ -45,7 +48,7 @@ public:
     std::string generatePass();
     void resetSettings();
 signals:
-    void databaseActionCompleted(bool success, std::string action, std::string errMsg = "", QList<std::string> results = {});
+    void databaseActionCompleted(bool success, std::string action, std::string errMsg = "", QList<std::string> results = {}, std::string stylesheet = "");
 private:
 
     QSqlDatabase db;
