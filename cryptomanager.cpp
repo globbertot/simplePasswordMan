@@ -3,11 +3,8 @@
 cryptoManager::cryptoManager() {
 
     db = QSqlDatabase::addDatabase("QSQLITE", "crypto");
-    db.setDatabaseName("simplePassMan.db");
-
-    if (!db.open() || !db.isValid()) {
-        qDebug() << "FATAL ERROR - " << db.lastError().text();return;
-    }
+    db.setDatabaseName(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/simplePassMan.db");
+    db.open();
 
     QSqlQuery build(db);build.prepare("CREATE TABLE IF NOT EXISTS magic(lost TEXT);");if (!build.exec()) { qDebug() << "FATAL ERROR - " << build.lastError().text();return; }
 
