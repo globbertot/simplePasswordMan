@@ -4,6 +4,7 @@
 #include <QCryptographicHash>
 #include <QFile>
 #include <QDebug>
+#include <QStandardPaths>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
