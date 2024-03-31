@@ -1,7 +1,6 @@
 #include "cryptomanager.h"
 
 cryptoManager::cryptoManager() {
-
     db = QSqlDatabase::addDatabase("QSQLITE", "crypto");
     db.setDatabaseName(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/simplePassMan.db");
     db.open();
