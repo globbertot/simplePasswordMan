@@ -29,6 +29,8 @@
 #include <QVariantMap>
 #include <QColorDialog>
 #include <QRegularExpression>
+#include <QMetaMethod>
+#include <functional>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -44,8 +46,6 @@ public:
     window(QWidget *parent = nullptr);
     ~window();
 
-    const int ENABLE_COMMANDS = 1;
-    const int DISABLE_COMMANDS = 0;
 
     // default themes presets
     QString darkThemeStyleSheet =
@@ -132,17 +132,50 @@ public:
         "QRadioButton:indicator { width: 16px; height: 16px; background: #ffeafc; }"
         "QRadioButton:indicator:checked { background: #add8e6; }";
 
+    QString greenThemeStyleSheet =
+        "QWidget#app { background: #1E4620; }"
+        "QPushButton { background: #0F3D13; color: #FFF; border: none; padding: 5px 10px; border-radius: 8px; }"
+        "QPushButton:hover { background: #196F25; }"
+        "QPushButton:disabled { background: #334d4d; color: #777777; }"
+        "QLineEdit { background: #0F3D13; color: #FFF; border: 1px solid #336633; border-radius: 4px; padding: 8px; }"
+        "QLineEdit::placeholder { color: #999; }"
+        "QCheckBox { color: #FFF; font-size: 14px; }"
+        "QCheckBox::indicator { width: 16px; height: 16px; background: #1E4620; border: 1px solid #FFF; }"
+        "QCheckBox::indicator:checked { background: #336633; }"
+        "QLabel { color: #FFF; }"
+        "QScrollBar:vertical { background: #1E4620; width: 10px; }"
+        "QScrollBar:handle:vertical { background: #336633; border-radius: 5px; }"
+        "QScrollBar:horizontal { background: #1E4620; height: 10px; }"
+        "QScrollBar:handle:horizontal { background: #336633; border-radius: 5px; }"
+        "QWidget#scrollThing { background: #0F3D13; min-width: 630px; min-height: 580px; font-size: 17px; }"
+        "QMessageBox { background: #0F3D13; color: #FFF; }"
+        "QRadioButton { color: #FFF; font-size: 14px; }"
+        "QRadioButton::indicator { width: 16px; height: 16px; background: #1E4620; border: 1px solid #FFF; }"
+        "QRadioButton::indicator:checked { background: #336633; }";
+
     // Core variables
+    const int ENABLE_COMMANDS = 1;
+    const int DISABLE_COMMANDS = 0;
+    const std::string updatesURL = "https://github.com/globbertot/simplePasswordMan/releases/latest";
+    const std::string VERSION = "V0.4";
+
     bool bShowPasswords = false;
     bool bAlwaysGeneratePass = true;
-    const std::string updatesURL = "https://github.com/globbertot/simplePasswordMan/releases/latest";
-    const std::string VERSION = "V0.3";
+    bool bCheckForUpdates = true;
+    bool bSavedTheme = false;
+
+    // (master key)
+    std::string MK = "";
+    bool bRememberUser = false;
+
     std::string currentTheme = "DARK";
     std::map<std::string, std::string> themes = {
         {"DARK", darkThemeStyleSheet.toStdString()},
         {"LIGHT", lightThemeStyleSheet.toStdString()},
         {"DARKBLUE", darkBlueThemeStyleSheet.toStdString()},
         {"LIGHTBLUE", lightBlueThemeStyleSheet.toStdString()},
+        {"GREEN", greenThemeStyleSheet.toStdString()},
+        {"NONE", ""},
     };
     // 1 = the widget 2 = text to be rendered
     const std::map<std::string, std::string> editableWidgets = {
@@ -178,12 +211,15 @@ public:
         {"height", "LineEdit"},
         {"font-size", "LineEdit"}
     };
-
     QString customTheme;
-    bool bSavedTheme = false;
-    bool bCheckForUpdates = true;
+
 
     // core logic
+    template<typename widgetType>
+    widgetType* createWidget(const QString& text = "", const QString& placeHolder = "",
+                             const QString& objName = "", const QFont& font = QFont("Arial", 12),
+                             const bool& wordWrap = true);
+    void showMKMenu();
     void create();
     void _delete();
     void search();
@@ -202,7 +238,8 @@ public:
     template<typename T>
     QList<T*> grabWidgets(QLayout* layout);
     void startPropertyEditor(std::shared_ptr<QButtonGroup> widgets, std::string themePreset);
-    void saveTheme(std::string themeName, std::string themePreset);
+    void showImportThemeMenu();
+    void saveTheme(std::string themeName);
     void enableDisableCommands(int mode);
     void clearScreen();
     bool isDefaultTheme(std::string themeName);
