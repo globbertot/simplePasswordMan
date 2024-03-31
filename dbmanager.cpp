@@ -11,8 +11,15 @@ dbManager::dbManager(QObject *parent) : QObject(parent), passPolicySets("globber
     QSqlQuery createDatabase(db);
     createDatabase.prepare("CREATE TABLE IF NOT EXISTS data (service TEXT, password TEXT);");
 
+    QSqlQuery createMKDatabase(db);
+    createMKDatabase.prepare("CREATE TABLE IF NOT EXISTS MK(MK TEXT);");
+
     if (!createDatabase.exec()) {
         qDebug() << "Error initializing database:" << createDatabase.lastError().text();return;
+    }
+
+    if (!createMKDatabase.exec()) {
+        qDebug() << "Error initializing MK:" << createMKDatabase.lastError().text();return;
     }
 }
 
@@ -110,6 +117,33 @@ std::string dbManager::generatePass() {
     }
 
     return pass;
+}
+
+void dbManager::MKCreator(std::string MK) {
+    // Grab it
+    QSqlQuery retrieve(db);retrieve.prepare("SELECT MK FROM MK");
+
+    if (retrieve.exec() && retrieve.next()) {
+        std::string decryptedMK = CM.encryptDecrypt(retrieve.value(0).toString().toStdString(), false);
+        if (!decryptedMK.empty() && MK == decryptedMK) {
+            emit databaseActionCompleted(true, "MKCREATION");
+            bMKExists = true;
+            return;
+        }
+        emit databaseActionCompleted(false, "MKCREATION", "Wrong master key, please try again");
+        return;
+    }
+    // Since we couldn't find it, lets assmue we need to create it or it doesnt exist
+    std::string encryptedMK = CM.encryptDecrypt(MK, true);
+    QSqlQuery create(db);create.prepare("INSERT INTO MK (MK) VALUES (:mk);");
+    create.bindValue(":mk", QString::fromStdString(encryptedMK));
+
+    if (create.exec()) {
+        emit databaseActionCompleted(true, "MKCREATION");
+        bMKExists = true;
+        return;
+    }
+    emit databaseActionCompleted(false, "MKCREATION", "Could not create master key, sql error log: "+ create.lastError().text().toStdString());
 }
 
 void dbManager::create(std::string service, std::string password) {
