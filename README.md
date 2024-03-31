@@ -9,15 +9,12 @@ This is a simple password manager written in C++ with the use of the Qt framewor
 - OpenSSL
 
 ## Features in Progress
-- Customizability
 - Settings Page (more settings)
-- Improved UI
-- Stability Enhancements
 - Better Error Handling
-- Improving the source code
+- Improving the source code (and readability)
 
 ## Known Issues
-**SOMETIMES**, when updating from V0.2 to V0.3, your old theme was still a thing and is found on the theme picker (FIX: delete that theme and select any other theme and this is fixed)
+- **SOMETIMES**, when updating from V0.2 to V0.3, your old theme was still a thing and is found on the theme picker (FIX: delete that theme and select any other theme and this is fixed)
 
 ## Download Instructions
 ### Windows
