@@ -33,6 +33,7 @@ public:
     };
     QSettings passPolicySets;
     const QString dbPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    bool bMKExists = false;
 
     // Core logic
     void create(std::string service, std::string password);
@@ -41,6 +42,7 @@ public:
     void showAll();
     void updatePassword(std::string service, std::string password);
     void updatePassPolicy(std::string setting, int val);
+    void MKCreator(std::string MK);
 
     // Helper functions
     bool exists(const std::string& table, const std::string& item, const std::string& columnToFind);
